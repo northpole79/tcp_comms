@@ -1,3 +1,5 @@
+use util;
+
 use std::io::prelude::*;
 use std::thread;
 use std::sync::mpsc::{self, TryRecvError};
@@ -14,7 +16,7 @@ fn handle_connection(mut stream: TcpStream) {
     stream.read(&mut buffer).unwrap();
     println!("Conn Request: {}", String::from_utf8_lossy(&buffer[..]));
     
-    match stream.write_fmt(format_args!("{}",String::from_utf8_lossy(&buffer[..]))) {
+    match stream.write(&mut buffer) {
         Ok(_) => {},
         Err(_e) => {}, // TODO: include error handling logic                                                
     }
@@ -67,8 +69,9 @@ fn handle_stream(mut stream: TcpStream) {
             },
             Ok(_) => {
                 println!("Msg Request: {}", String::from_utf8_lossy(&buffer[..]));
+                util::display("Server", util::deserialize(&buffer[0..util::TOTAL_SIZE]));
                 
-                match stream.write_fmt(format_args!("{}",String::from_utf8_lossy(&buffer[..]))) {
+                match stream.write(&mut buffer) {
                     Ok(_) => {},
                     Err(_e) => {}, // TODO: include error handling logic
                 }
