@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: centos:7
+
+    steps:
+      - checkout
+
+      - run:
+          name: install cargo, rust
+          command: sudo yum install -y rust cargo
+
+      - run:
+          name: Print the Current Time
+          command: date
