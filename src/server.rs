@@ -26,14 +26,16 @@ fn handle_connection(mut stream: TcpStream) {
 
 pub fn start() -> mpsc::Sender<Message> {
     let (accept_sender, accept_receiver) = mpsc::channel();    
-    let accept_receiver = Arc::new(Mutex::new(accept_receiver)); // convert to heap/global controlled variable
+    //let accept_receiver = Arc::new(Mutex::new(accept_receiver)); // convert to heap/global controlled variable
     thread::spawn(move || {
-        handle_accept(Arc::clone(&accept_receiver));
+        //handle_accept(Arc::clone(&accept_receiver));
+        handle_accept(accept_receiver);
     });
     accept_sender
 }
 
-fn handle_accept(accept_receiver: Arc<Mutex<mpsc::Receiver<Message>>>) {
+//fn handle_accept(accept_receiver: Arc<Mutex<mpsc::Receiver<Message>>>) {
+fn handle_accept(accept_receiver: mpsc::Receiver<Message>) {    
     let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
     listener.set_nonblocking(true).expect("Cannot set non-blocking");
     
@@ -46,7 +48,8 @@ fn handle_accept(accept_receiver: Arc<Mutex<mpsc::Receiver<Message>>>) {
             },
             Err(_e) => {}, //TODO: include error handling logic
         }
-        match accept_receiver.lock().unwrap().try_recv() {
+        //match accept_receiver.lock().unwrap().try_recv() {
+        match accept_receiver.try_recv() {
             Ok(Message::Terminate) |
             Err(TryRecvError::Disconnected) => {
                 println!("Accept terminating");
