@@ -8,9 +8,14 @@ jobs:
       - checkout
 
       - run:
-          name: install cargo, rust
-          command: sudo yum install -y rust cargo
-
+          name: install centos-release-scl
+          command: yum install -y centos-release-scl
+      - run:
+          name: install rust, cargo
+	  command: yum install -y rust-toolset-7
+      - run:
+          name: start using software collections
+	  command: scl enable rust-toolset-7 bash
       - run:
           name: Print the Current Time
           command: date
