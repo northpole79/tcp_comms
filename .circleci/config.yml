@@ -2,20 +2,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: centos:7
-
+      - image: circleci/rust:1.31
     steps:
       - checkout
-
       - run:
-          name: install centos-release-scl
-          command: yum install -y centos-release-scl
+          name: Build tcp_comms
+          command: cargo build --verbose
       - run:
-          name: install rust, cargo
-	  command: yum install -y rust-toolset-7
-      - run:
-          name: start using software collections
-	  command: scl enable rust-toolset-7 bash
-      - run:
-          name: Print the Current Time
-          command: date
+          name: Test tcp_comms
+          command: ./test.sh
